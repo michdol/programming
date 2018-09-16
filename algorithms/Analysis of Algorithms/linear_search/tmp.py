@@ -31,3 +31,5 @@ data = {
 df = pd.DataFrame(data)
 df.plot(x='n', y='worst case', style='k--')
 plt.show()
+
+# https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.plot.html
