@@ -58,12 +58,40 @@ class LinkedList(object):
 			tmp = tmp.next
 		raise ValueError("{} not present in the list".format(data))
 
+	def delete_at_index(self, index):
+		if self.head is None:
+			raise IndexError("\delete from empty list")
+		if index == 0:
+			return self.delete_head()
+
+		prev_node = self.head
+		tmp = self.head.next
+		for i in range(index - 1):
+			prev_node = tmp
+			tmp = self.get_next_node_or_index_error(tmp)
+		# At this point tmp is element at given index.
+		if tmp is None:
+			raise IndexError("list index out of range")
+		prev_node.next = tmp.next
+		del tmp
+
+	def delete_head(self):
+		tmp = self.head
+		self.head = tmp.next
+		del tmp
+
+	def get_next_node_or_index_error(self, node):
+		try:
+			return node.next
+		except AttributeError:
+			raise IndexError("list index out of range")
+
 	def get_prev_node(self, node):
+		if self.head is None:
+			raise ValueError("the list is empty")
 		if not isinstance(node, Node):
 			raise ValueError("Node argument must be {}".format(Node))
 		prev_node = self.head
-		if prev_node is None:
-			return None
 		while prev_node.next is not None:
 			if prev_node.next is node:
 				return prev_node

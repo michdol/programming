@@ -158,9 +158,17 @@ class LinkedListTest(TestCase):
 
 	def test_get_prev_node_param_is_none(self):
 		llist = LinkedList()
+		llist.head = Node(1)
 		with self.assertRaises(ValueError) as e:
 			llist.get_prev_node(None)
 		self.assertEqual(e.exception.args[0], "Node argument must be <class 'structure.Node'>")
+
+	def test_get_prev_node_empty_list(self):
+		llist = LinkedList()
+		node = Node(1)
+		with self.assertRaises(ValueError) as e:
+			llist.get_prev_node(node)
+		self.assertEqual(e.exception.args[0], "the list is empty")
 
 	def test_delete_first_node(self):
 		llist, first, second, third = self.create_simple_list()
@@ -202,6 +210,40 @@ class LinkedListTest(TestCase):
 		with self.assertRaises(ValueError) as e:
 			llist.delete(4)
 		self.assertEqual(e.exception.args[0], "4 not present in the list")
+
+	def test_delete_at_index_first_element(self):
+		llist, first, second, third = self.create_simple_list()
+		llist.delete_at_index(0)
+		self.assertIs(llist.head, second)
+
+	def test_delete_at_index_middle_element(self):
+		llist, first, second, third = self.create_simple_list()
+		llist.delete_at_index(1)
+		self.assertIs(llist.head.next, third)
+
+	def test_delete_at_index_last_element(self):
+		llist, first, second, third = self.create_simple_list()
+		llist.delete_at_index(2)
+		self.assertIsNone(llist.head.next.next)
+
+	def test_delete_at_index_out_of_range(self):
+		llist, first, second, third = self.create_simple_list()
+		with self.assertRaises(IndexError) as e:
+			# Delete fourth element.
+			llist.delete_at_index(3)
+		self.assertEqual(e.exception.args[0], "list index out of range")
+
+		with self.assertRaises(IndexError) as e:
+			# Delete fifth element.
+			llist.delete_at_index(4)
+		self.assertEqual(e.exception.args[0], "list index out of range")
+
+	def test_delete_at_index_from_empty_list(self):
+		# Empty list
+		llist = LinkedList()
+		with self.assertRaises(IndexError) as e:
+			llist.delete_at_index(0)
+		self.assertEqual(e.exception.args[0], "\delete from empty list")
 
 
 if __name__ == "__main__":
