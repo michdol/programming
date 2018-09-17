@@ -3,6 +3,9 @@ class Node(object):
 		self.data = data
 		self.next = None
 
+	def __str__(self):
+		return "Node <{}, {}>".format(self.data, self.next)
+
 
 class UnoptimizedLinkedList(object):
 	def __str__(self):
@@ -144,3 +147,66 @@ class UnoptimizedLinkedList(object):
 		while tmp.next is not None:
 			tmp = tmp.next
 		return tmp
+
+	def get(self, data, default=None):
+		tmp = self.head
+		while tmp:
+			if tmp.data == data:
+				return tmp
+			tmp = tmp.next
+		return default
+
+	def swap_nodes(self, x, y):
+		"""
+		Head
+		+----+------+     +----+------+     +----+------+
+		| 1  |  o-------->| 2  |  o-------->|  3 | null |
+		+----+------+     +----+------+     +----+------+
+		"""
+		x = self.get(x)
+		y = self.get(y)
+
+		x_prev_node = self.get_prev_node(x)
+		x_next_node = x.next
+		y_prev_node = self.get_prev_node(y)
+		y_next_node = y.next
+		x_is_head = x is self.head
+		y_is_head = y is self.head
+		adjacent_nodes = x.next is y or y.next is x
+
+		if not adjacent_nodes:
+			if isinstance(x_prev_node, Node):
+				x_prev_node.next = y
+		x.next = y_next_node
+		"""
+		+----+------+     +----+------+
+		| 1  |  o-------->| 3  | null |
+		+----+------+     +----+------+
+		
+		+----+------+     +----+------+
+		| 2  |  o-------->|  3 | null |
+		+----+------+     +----+------+
+		"""
+		if adjacent_nodes:
+			y.next = x
+		else:
+			y.next = x_next_node
+		"""
+		+----+------+     +----+------+     +----+------+
+		| 2  |  o-------->| 1  |  o-------->|  3 | null |
+		+----+------+     +----+------+     +----+------+
+		"""
+		if not adjacent_nodes:
+			if isinstance(y_prev_node, Node):
+				y_prev_node.next = x
+
+		if x_is_head:
+			self.head = y
+		elif y_is_head:
+			self.head = x
+		"""
+		Head
+		+----+------+     +----+------+     +----+------+
+		| 2  |  o-------->| 1  |  o-------->|  3 | null |
+		+----+------+     +----+------+     +----+------+
+		"""

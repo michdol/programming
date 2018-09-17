@@ -307,6 +307,37 @@ class LinkedListTest(TestCase):
 		llist, first, second, third = self.create_simple_list()
 		self.assertEqual(len(llist), 3)
 
+	def test_get(self):
+		llist = UnoptimizedLinkedList()
+		self.assertIsNone(llist.get(1))
+		llist, first, second, third = self.create_simple_list()
+		self.assertIs(llist.get(1), first)
+		self.assertIs(llist.get(2), second)
+		self.assertIs(llist.get(3), third)
+
+	def test_get_default(self):
+		llist = UnoptimizedLinkedList()
+		self.assertEqual(llist.get(1, 5), 5)
+
+	def test_swap_nodes_head_and_second(self):
+		"""
+		Head
+		+----+------+     +----+------+     +----+------+
+		| 1  |  o-------->| 2  |  o-------->|  3 | null |
+		+----+------+     +----+------+     +----+------+
+		"""
+		llist, first, second, third = self.create_simple_list()
+		llist.swap_nodes(first.data, second.data)
+		self.assertIs(llist.head, second)
+		self.assertIs(llist.head.next, first)
+		self.assertIs(llist.head.next.next, third)
+
+		llist, first, second, third = self.create_simple_list()
+		llist.swap_nodes(second.data, first.data)
+		self.assertIs(llist.head, second)
+		self.assertIs(llist.head.next, first)
+		self.assertIs(llist.head.next.next, third)
+
 
 if __name__ == "__main__":
 	unittest_main()
