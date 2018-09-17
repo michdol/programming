@@ -283,6 +283,21 @@ class LinkedListTest(TestCase):
 		self.assertEqual(llist.head.data, 'a')
 		self.assertEqual(llist.head.next.data, 'b')
 
+	def test_iterate(self):
+		llist, first, second, third = self.create_simple_list()
+		for idx, elem in enumerate(llist):
+			if idx == 0:
+				self.assertIs(elem, first)
+			elif idx == 1:
+				self.assertIs(elem, second)
+			elif idx == 2:
+				self.assertIs(elem, third)
+
+	def test_iterate_empty_list(self):
+		llist = UnoptimizedLinkedList()
+		with self.assertRaises(StopIteration):
+			next(llist)
+
 
 if __name__ == "__main__":
 	unittest_main()

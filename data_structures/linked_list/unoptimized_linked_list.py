@@ -13,8 +13,19 @@ class UnoptimizedLinkedList(object):
 			tmp = tmp.next
 		return "Linked list <{}, ...>".format(', '.join(data))
 
+	def __iter__(self):
+		return self
+
+	def __next__(self):
+		if self.current is None:
+			raise StopIteration()
+		self.current = self.current.next
+		return self.current
+
 	def __init__(self, iterable=None):
 		self.head = None
+		# For iterator purposes.
+		self.current = self.head
 		if iterable is not None:
 			if not self.is_iterable(iterable):
 				raise TypeError("{} not iterable".format(iterable))
