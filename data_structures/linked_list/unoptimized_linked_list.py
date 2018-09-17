@@ -22,6 +22,14 @@ class UnoptimizedLinkedList(object):
 		self.current = self.current.next
 		return self.current
 
+	def __len__(self):
+		count = 0
+		tmp = self.head
+		while tmp:
+			count += 1
+			tmp = tmp.next
+		return count
+
 	def __init__(self, iterable=None):
 		self.head = None
 		# For iterator purposes.

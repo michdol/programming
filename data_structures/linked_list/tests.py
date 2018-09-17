@@ -298,6 +298,15 @@ class LinkedListTest(TestCase):
 		with self.assertRaises(StopIteration):
 			next(llist)
 
+	def test_len(self):
+		llist = UnoptimizedLinkedList()
+		self.assertEqual(len(llist), 0)
+		node = Node(1)
+		llist.head = node
+		self.assertEqual(len(llist), 1)
+		llist, first, second, third = self.create_simple_list()
+		self.assertEqual(len(llist), 3)
+
 
 if __name__ == "__main__":
 	unittest_main()
