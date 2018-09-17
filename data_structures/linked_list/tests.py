@@ -1,11 +1,11 @@
 from unittest import TestCase, main as unittest_main
 
-from structure import LinkedList, Node
+from unoptimized_linked_list import UnoptimizedLinkedList, Node
 
 
 class LinkedListTest(TestCase):
 	def create_simple_list(self):
-		llist = LinkedList()
+		llist = UnoptimizedLinkedList()
 
 		first = Node(1)
 		second = Node(2)
@@ -17,7 +17,7 @@ class LinkedListTest(TestCase):
 
 	def test_with_comment(self):
 		# Start with the empty list
-		llist = LinkedList()
+		llist = UnoptimizedLinkedList()
 
 		llist.head = Node(1)
 		second = Node(2)
@@ -65,7 +65,7 @@ class LinkedListTest(TestCase):
 		'''
 
 	def test_create_linked_list(self):
-		llist = LinkedList()
+		llist = UnoptimizedLinkedList()
 
 		first = Node(1)
 		second = Node(2)
@@ -107,7 +107,7 @@ class LinkedListTest(TestCase):
 		self.assertIs(llist.head.data, 4)
 
 	def test_get_last_node(self):
-		llist = LinkedList()
+		llist = UnoptimizedLinkedList()
 		self.assertIsNone(llist.get_last_node())
 		first = Node(1)
 		llist.head = first
@@ -122,7 +122,7 @@ class LinkedListTest(TestCase):
 		self.assertIs(third.next.data, 4)
 
 	def test_append_empty_list(self):
-		llist = LinkedList()
+		llist = UnoptimizedLinkedList()
 		llist.append(1)
 		self.assertEqual(llist.head.data, 1)
 
@@ -137,18 +137,18 @@ class LinkedListTest(TestCase):
 		self.assertEqual(text_string, expected_string)
 
 	def test_insert_empty_list(self):
-		llist = LinkedList()
+		llist = UnoptimizedLinkedList()
 		node = Node(1)
 		with self.assertRaises(ValueError) as e:
 			llist.insert(node, 2)
 			self.assertEqual(e.exception.args[0], "Cannot insert while the list is empty")
 
 	def test_insert_prev_node_is_none(self):
-		llist = LinkedList()
+		llist = UnoptimizedLinkedList()
 		llist.head = Node(2)
 		with self.assertRaises(ValueError) as e:
 			llist.insert(None, 1)
-		self.assertEqual(e.exception.args[0], "Previous node must be <class 'structure.Node'>")
+		self.assertEqual(e.exception.args[0], "Previous node must be Node")
 
 	def test_get_prev_node(self):
 		llist, first, second, third = self.create_simple_list()
@@ -157,14 +157,14 @@ class LinkedListTest(TestCase):
 		self.assertIs(llist.get_prev_node(third), second)
 
 	def test_get_prev_node_param_is_none(self):
-		llist = LinkedList()
+		llist = UnoptimizedLinkedList()
 		llist.head = Node(1)
 		with self.assertRaises(ValueError) as e:
 			llist.get_prev_node(None)
-		self.assertEqual(e.exception.args[0], "Node argument must be <class 'structure.Node'>")
+		self.assertEqual(e.exception.args[0], "node argument must be Node")
 
 	def test_get_prev_node_empty_list(self):
-		llist = LinkedList()
+		llist = UnoptimizedLinkedList()
 		node = Node(1)
 		with self.assertRaises(ValueError) as e:
 			llist.get_prev_node(node)
@@ -180,7 +180,7 @@ class LinkedListTest(TestCase):
 		self.assertEqual(text_string, expected_string)
 
 	def test_delete_first_node_one_element_list(self):
-		llist = LinkedList()
+		llist = UnoptimizedLinkedList()
 		llist.append(1)
 		llist.delete(1)
 		self.assertIsNone(llist.head)
@@ -240,10 +240,48 @@ class LinkedListTest(TestCase):
 
 	def test_delete_at_index_from_empty_list(self):
 		# Empty list
-		llist = LinkedList()
+		llist = UnoptimizedLinkedList()
 		with self.assertRaises(IndexError) as e:
 			llist.delete_at_index(0)
 		self.assertEqual(e.exception.args[0], "\delete from empty list")
+
+	def test_is_iterable(self):
+		llist = UnoptimizedLinkedList()
+		self.assertTrue(llist.is_iterable([]))
+		self.assertTrue(llist.is_iterable(()))
+		self.assertTrue(llist.is_iterable(''))
+		self.assertFalse(llist.is_iterable(1))
+
+	def test_convert_from_list(self):
+		input = [1, 2, 3]
+		llist = UnoptimizedLinkedList(iterable=input)
+		self.assertEqual(llist.head.data, 1)
+		self.assertEqual(llist.head.next.data, 2)
+		self.assertEqual(llist.head.next.next.data, 3)
+
+	def test_convert_from_empty_list(self):
+		llist = UnoptimizedLinkedList(iterable=[])
+		self.assertIsNone(llist.head)
+
+	def test_convert_from_tuple(self):
+		input = (1, 2, 3)
+		llist = UnoptimizedLinkedList(iterable=input)
+		self.assertEqual(llist.head.data, 1)
+		self.assertEqual(llist.head.next.data, 2)
+		self.assertEqual(llist.head.next.next.data, 3)
+		self.assertIsNone(llist.head.next.next.next)
+
+	def test_convert_from_one_element_tuple(self):
+		input = (1,)
+		llist = UnoptimizedLinkedList(iterable=input)
+		self.assertEqual(llist.head.data, 1)
+		self.assertIsNone(llist.head.next)
+
+	def test_convert_from_dict(self):
+		a = {'a': 1, 'b': 2}
+		llist = UnoptimizedLinkedList(iterable=a)
+		self.assertEqual(llist.head.data, 'a')
+		self.assertEqual(llist.head.next.data, 'b')
 
 
 if __name__ == "__main__":

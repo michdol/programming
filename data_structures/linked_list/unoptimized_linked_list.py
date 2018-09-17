@@ -4,10 +4,7 @@ class Node(object):
 		self.next = None
 
 
-class LinkedList(object):
-	def __init__(self):
-		self.head = None
-
+class UnoptimizedLinkedList(object):
 	def __str__(self):
 		tmp = self.head
 		data = []
@@ -15,6 +12,30 @@ class LinkedList(object):
 			data.append(tmp.data.__str__())
 			tmp = tmp.next
 		return "Linked list <{}, ...>".format(', '.join(data))
+
+	def __init__(self, iterable=None):
+		self.head = None
+		if iterable is not None:
+			if not self.is_iterable(iterable):
+				raise TypeError("{} not iterable".format(iterable))
+			self.convert_from_iterable(iterable)
+
+	def is_iterable(self, iterable):
+		try:
+			iter(iterable)
+		except TypeError:
+			return False
+		return True
+
+	def convert_from_iterable(self, iterable):
+		prev_node = None
+		for item in iterable:
+			node = Node(item)
+			if self.head is None:
+				self.head = node
+			if isinstance(prev_node, Node):
+				prev_node.next = node
+			prev_node = node
 
 	def prepend(self, data):
 		new_node = Node(data)
@@ -39,7 +60,7 @@ class LinkedList(object):
 		if self.head is None:
 			raise ValueError("Cannot insert while the list is empty")
 		if not isinstance(prev_node, Node):
-			raise ValueError("Previous node must be {}".format(Node))
+			raise ValueError("Previous node must be Node")
 		new_node = Node(data)
 		new_node.next = prev_node.next
 		prev_node.next = new_node
@@ -90,7 +111,7 @@ class LinkedList(object):
 		if self.head is None:
 			raise ValueError("the list is empty")
 		if not isinstance(node, Node):
-			raise ValueError("Node argument must be {}".format(Node))
+			raise ValueError("node argument must be Node")
 		prev_node = self.head
 		while prev_node.next is not None:
 			if prev_node.next is node:
