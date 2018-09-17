@@ -1,7 +1,6 @@
-# TODO: get some library to visualise results
-
 
 def linear_search(array, target):
+	# idx is number of operations performed.
 	for idx, item in enumerate(array, start=1):
 		if item == target:
 			return idx, item
