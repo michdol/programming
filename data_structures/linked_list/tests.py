@@ -15,6 +15,12 @@ class LinkedListTest(TestCase):
 		second.next = third
 		return llist, first, second, third
 
+	def create_list(self, data):
+		nodes = []
+		for x in data:
+			nodes.append(Node(x))
+		return UnoptimizedLinkedList(nodes)
+
 	def test_with_comment(self):
 		# Start with the empty list
 		llist = UnoptimizedLinkedList()
@@ -292,6 +298,8 @@ class LinkedListTest(TestCase):
 				self.assertIs(elem, second)
 			elif idx == 2:
 				self.assertIs(elem, third)
+			elif idx == 3:
+				raise ValueError("Test failed, should not return more elements.")
 
 	def test_iterate_empty_list(self):
 		llist = UnoptimizedLinkedList()
@@ -337,6 +345,37 @@ class LinkedListTest(TestCase):
 		self.assertIs(llist.head, second)
 		self.assertIs(llist.head.next, first)
 		self.assertIs(llist.head.next.next, third)
+
+	def test_swap_not_adjacent_nodes_head_and_tail(self):
+		llist = self.create_list(range(1, 7))
+		first = llist.head
+		first_next = first.next
+		self.assertIs(llist.head, first)
+		last = llist.get_last_node()
+		last_previous = llist.get_prev_node(last)
+		self.assertIsNone(last.next)
+		llist.swap_nodes(first.data, last.data)
+		self.assertIs(llist.head, last)
+		self.assertIs(llist.head.next, first_next)
+		self.assertEqual(last_previous.next, first)
+
+	def test_swap_not_adjacent_nodes_second_fifth(self):
+		llist = self.create_list(range(1, 7))
+		nodes = [node for node in llist]
+		head = llist.head
+		tail = llist.get_last_node()
+
+		second = nodes[1]
+		second_prev = llist.get_prev_node(second)
+		second_next = second.next
+		fifth = nodes[4]
+		fifth_prev = llist.get_prev_node(fifth)
+		fifth_next = fifth.next
+
+		llist.swap_nodes(second.data, fifth.data)
+
+		self.assertIs(second_prev, llist.get_prev_node(fifth))
+		self.assertIs(fifth_prev, llist.get_prev_node(second))
 
 
 if __name__ == "__main__":

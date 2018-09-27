@@ -8,6 +8,15 @@ class Node(object):
 
 
 class UnoptimizedLinkedList(object):
+	current = None
+
+	def __init__(self, iterable=None):
+		self.head = None
+		if iterable is not None:
+			if not self.is_iterable(iterable):
+				raise TypeError("{} not iterable".format(iterable))
+			self.convert_from_iterable(iterable)
+
 	def __str__(self):
 		tmp = self.head
 		data = []
@@ -20,9 +29,15 @@ class UnoptimizedLinkedList(object):
 		return self
 
 	def __next__(self):
+		if self.head is None:
+			raise StopIteration()
+		if self.current is None:
+			self.current = self.head
+			return self.current
+		else:
+			self.current = self.current.next
 		if self.current is None:
 			raise StopIteration()
-		self.current = self.current.next
 		return self.current
 
 	def __len__(self):
@@ -33,15 +48,6 @@ class UnoptimizedLinkedList(object):
 			tmp = tmp.next
 		return count
 
-	def __init__(self, iterable=None):
-		self.head = None
-		# For iterator purposes.
-		self.current = self.head
-		if iterable is not None:
-			if not self.is_iterable(iterable):
-				raise TypeError("{} not iterable".format(iterable))
-			self.convert_from_iterable(iterable)
-
 	def is_iterable(self, iterable):
 		try:
 			iter(iterable)
@@ -50,6 +56,7 @@ class UnoptimizedLinkedList(object):
 		return True
 
 	def convert_from_iterable(self, iterable):
+		# TODO: refactor this
 		prev_node = None
 		for item in iterable:
 			node = Node(item)
@@ -157,56 +164,42 @@ class UnoptimizedLinkedList(object):
 		return default
 
 	def swap_nodes(self, x, y):
-		"""
-		Head
-		+----+------+     +----+------+     +----+------+
-		| 1  |  o-------->| 2  |  o-------->|  3 | null |
-		+----+------+     +----+------+     +----+------+
-		"""
-		x = self.get(x)
-		y = self.get(y)
-
-		x_prev_node = self.get_prev_node(x)
-		x_next_node = x.next
-		y_prev_node = self.get_prev_node(y)
-		y_next_node = y.next
-		x_is_head = x is self.head
-		y_is_head = y is self.head
-		adjacent_nodes = x.next is y or y.next is x
-
-		if not adjacent_nodes:
-			if isinstance(x_prev_node, Node):
-				x_prev_node.next = y
-		x.next = y_next_node
-		"""
-		+----+------+     +----+------+
-		| 1  |  o-------->| 3  | null |
-		+----+------+     +----+------+
-		
-		+----+------+     +----+------+
-		| 2  |  o-------->|  3 | null |
-		+----+------+     +----+------+
-		"""
+		x_node = self.get(x)
+		y_node = self.get(y)
+		x_is_head = x_node is self.head
+		y_is_head = y_node is self.head
+		adjacent_nodes = x_node.next is y_node or y_node.next is x_node
 		if adjacent_nodes:
-			y.next = x
+			if x_node.next is y_node:
+				left = x_node
+				right = y_node
+			else:
+				left = y_node
+				right = x_node
+
+			left_previous_node = self.get_prev_node(left)
+			right_next_node = right.next
+			if isinstance(left_previous_node, Node):
+				left_previous_node.next = right
+			right.next = left
+			left.next = right_next_node
 		else:
-			y.next = x_next_node
-		"""
-		+----+------+     +----+------+     +----+------+
-		| 2  |  o-------->| 1  |  o-------->|  3 | null |
-		+----+------+     +----+------+     +----+------+
-		"""
-		if not adjacent_nodes:
+			x_prev_node = self.get_prev_node(x_node)
+			x_next_node = x_node.next
+
+			y_prev_node = self.get_prev_node(y_node)
+			y_next_node = y_node.next
+
+			if isinstance(x_prev_node, Node):
+				x_prev_node.next = y_node
+			if isinstance(x_next_node, Node):
+				y_node.next = x_next_node
 			if isinstance(y_prev_node, Node):
-				y_prev_node.next = x
+				y_prev_node.next = x_node
+			if isinstance(y_next_node, Node):
+				x_node.next = y_next_node
 
 		if x_is_head:
-			self.head = y
+			self.head = y_node
 		elif y_is_head:
-			self.head = x
-		"""
-		Head
-		+----+------+     +----+------+     +----+------+
-		| 2  |  o-------->| 1  |  o-------->|  3 | null |
-		+----+------+     +----+------+     +----+------+
-		"""
+			self.head = x_node
