@@ -283,12 +283,6 @@ class LinkedListTest(TestCase):
 		self.assertEqual(llist.head.data, 1)
 		self.assertIsNone(llist.head.next)
 
-	def test_convert_from_dict(self):
-		a = {'a': 1, 'b': 2}
-		llist = UnoptimizedLinkedList(iterable=a)
-		self.assertEqual(llist.head.data, 'a')
-		self.assertEqual(llist.head.next.data, 'b')
-
 	def test_iterate(self):
 		llist, first, second, third = self.create_simple_list()
 		for idx, elem in enumerate(llist):
@@ -376,6 +370,10 @@ class LinkedListTest(TestCase):
 
 		self.assertIs(second_prev, llist.get_prev_node(fifth))
 		self.assertIs(fifth_prev, llist.get_prev_node(second))
+		self.assertIs(second_next, fifth.next)
+		self.assertIs(fifth_next, second.next)
+		self.assertIs(second.next, tail)
+		self.assertIs(head.next, fifth)
 
 
 if __name__ == "__main__":

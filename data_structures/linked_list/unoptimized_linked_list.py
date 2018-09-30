@@ -56,15 +56,14 @@ class UnoptimizedLinkedList(object):
 		return True
 
 	def convert_from_iterable(self, iterable):
-		# TODO: refactor this
-		prev_node = None
-		for item in iterable:
-			node = Node(item)
-			if self.head is None:
-				self.head = node
-			if isinstance(prev_node, Node):
-				prev_node.next = node
-			prev_node = node
+		if len(iterable) < 1:
+			return
+		self.head = Node(iterable[0])
+		prev_node = self.head
+		for data in iterable[1:]:
+			new_node = Node(data)
+			prev_node.next = new_node
+			prev_node = new_node
 
 	def prepend(self, data):
 		new_node = Node(data)
