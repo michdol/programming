@@ -4,7 +4,7 @@ class Node(object):
 		self.next = None
 
 	def __str__(self):
-		return "Node <{}, {}>".format(self.data, self.next)
+		return "Node <%d>" % self.data
 
 
 class UnoptimizedLinkedList(object):
@@ -202,3 +202,17 @@ class UnoptimizedLinkedList(object):
 			self.head = y_node
 		elif y_is_head:
 			self.head = x_node
+
+	def reverse(self):
+		if self.head is None:
+			return
+		previous = self.head
+		current = previous.next
+		while True:
+			next_ = current.next
+			current.next = previous
+			previous.next = None
+			previous = current
+			current = next_
+			if next_ is None:
+				break

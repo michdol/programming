@@ -375,6 +375,15 @@ class LinkedListTest(TestCase):
 		self.assertIs(second.next, tail)
 		self.assertIs(head.next, fifth)
 
+	def test_reverse(self):
+		llist = self.create_list(range(1, 5))
+		llist.reverse()
+		nodes = [node for node in llist]
+		self.assertEqual(nodes[0].data, 4)
+		self.assertEqual(nodes[1].data, 3)
+		self.assertEqual(nodes[2].data, 2)
+		self.assertEqual(nodes[3].data, 1)
+
 
 if __name__ == "__main__":
 	unittest_main()
