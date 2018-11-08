@@ -20,4 +20,4 @@ def binary_search_with_merge_sort():
 	raise NotImplementedError("do me")
 
 
-binary_search_with_merge_sort()g
+binary_search_with_merge_sort()
