@@ -21,8 +21,30 @@ def safe_list_item_getter(func):
 
 
 class Heap(object):
-	def __init__(self):
-		self.nodes = []
+	def __init__(self, nodes=None):
+		if nodes:
+			self.create_tree(nodes)
+		else:
+			self.nodes = []
+
+	def create_tree(self, nodes):
+		value = 1
+		for idx, node in enumerate(nodes):
+			left_idx, right_idx = self._calculate_children_indexes(idx, value)
+			left_node = self.get_node_by_idx(left_idx, nodes)
+			right_node = self.get_node_by_idx(right_idx, nodes)
+			node.left = left_node
+			node.right = right_node
+			# If there are no more nodes to set
+			if not all([left_node, right_node]):
+				break
+			value += 1
+		self.nodes = nodes
+
+	def _calculate_children_indexes(self, idx, value):
+		left_idx = idx + value
+		right_idx = left_idx + 1
+		return left_idx, right_idx
 
 	@staticmethod
 	def get_left_index(i):
@@ -45,8 +67,10 @@ class Heap(object):
 		return self.nodes[(i - 1) // 2]
 
 	@safe_list_item_getter
-	def get_node_by_idx(self, i):
-		return self.nodes[i]
+	def get_node_by_idx(self, i, nodes=None):
+		if not nodes:
+			nodes = self.nodes
+		return nodes[i]
 
 	def max_heapify(self, i):
 		l_idx = self.get_left_index(i)

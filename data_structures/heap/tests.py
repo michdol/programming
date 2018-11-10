@@ -98,6 +98,43 @@ class HeapTest(TestCase):
 		self.assertEqual(self.heap.nodes[3].value, 2)
 		self.assertEqual(self.heap.nodes[4].value, 1)
 
+	def test_create_tree(self):
+		"""
+						0
+					/      \
+				  1          2
+				/  \      /    \
+			   3    4    5      6
+			  /\   /\   / \    /\
+			 7 8  9 10 11 12 13 14
+
+		0 - 1, 2	(+1)
+		1 - 3, 4	(+2)
+		2 - 5, 6	(+3)
+		3 - 7, 8	(+4)
+		4 - 9, 10	(+5)
+		5 - 11, 12	(+6)
+		6 - 13, 14	(+7)
+		"""
+		nodes = [Node(i) for i in range(14)]
+		heap = Heap(nodes)
+		self.assertEqual(heap.nodes, nodes)
+		root = heap.nodes[0]
+		self.assertEqual(root.left, heap.nodes[1])
+		self.assertEqual(root.right, heap.nodes[2])
+		self.assertEqual(root.left.left, heap.nodes[3])
+		self.assertEqual(root.left.right, heap.nodes[4])
+		self.assertEqual(root.right.left, heap.nodes[5])
+		self.assertEqual(root.right.right, heap.nodes[6])
+		self.assertEqual(root.left.left.left, heap.nodes[7])
+		self.assertEqual(root.left.left.right, heap.nodes[8])
+		self.assertEqual(root.left.right.left, heap.nodes[9])
+		self.assertEqual(root.left.right.right, heap.nodes[10])
+		self.assertEqual(root.right.left.left, heap.nodes[11])
+		self.assertEqual(root.right.left.right, heap.nodes[12])
+		self.assertEqual(root.right.right.left, heap.nodes[13])
+		self.assertIsNone(root.right.right.right)
+
 
 if __name__ == "__main__":
 	main()
