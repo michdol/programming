@@ -217,6 +217,22 @@ class HeapTest(TestCase):
 		self.assertEqual(self.heap.nodes[8].value, 8)
 		self.assertEqual(self.heap.nodes[9].value, 16)
 
+	def test_height_of_heap(self):
+		self.heap = Heap([Node(i) for i in [4]])
+		self.assertEqual(self.heap.height, 0)
+
+		self.heap = Heap([Node(i) for i in [4, 1]])
+		self.assertEqual(self.heap.height, 1)
+
+		self.heap = Heap([Node(i) for i in [4, 1, 3]])
+		self.assertEqual(self.heap.height, 1)
+
+		self.heap = Heap([Node(i) for i in [4, 1, 3, 2, 16, 9, 10, 14, 8, 7]])
+		self.assertEqual(self.heap.height, 3)
+
+		self.heap = Heap([Node(i) for i in [4, 1, 3, 2, 16, 9, 10, 14, 8, 7, 15, 17, 18, 19, 20, 21]])
+		self.assertEqual(self.heap.height, 4)
+
 
 if __name__ == "__main__":
 	main()

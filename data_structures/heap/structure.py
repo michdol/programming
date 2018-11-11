@@ -2,6 +2,8 @@ import pdb
 
 from operator import gt, lt
 
+import math
+
 
 class Node(object):
 	def __init__(self, value):
@@ -32,6 +34,10 @@ class Heap(object):
 		else:
 			self.nodes = []
 		self.size = len(self.nodes)
+
+	@property
+	def height(self):
+		return math.floor(math.log(self.size, 2))
 
 	def create_tree(self, nodes):
 		value = 1
