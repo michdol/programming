@@ -1,5 +1,7 @@
 import pdb
 
+from operator import gt, lt
+
 
 class Node(object):
 	def __init__(self, value):
@@ -26,6 +28,7 @@ class Heap(object):
 			self.create_tree(nodes)
 		else:
 			self.nodes = []
+		self.size = len(self.nodes)
 
 	def create_tree(self, nodes):
 		value = 1
@@ -73,22 +76,29 @@ class Heap(object):
 		return nodes[i]
 
 	def max_heapify(self, i):
+		self._heapify(i, gt)
+
+	def min_heapify(self, i):
+		self._heapify(i, lt)
+
+	def _heapify(self, i, condition_operator):
+		if not self.size:
+			self.size = len(self.nodes)
+		root_node = self.get_node_by_idx(i)
 		l_idx = self.get_left_index(i)
 		r_idx = self.get_right_index(i)
-		heap_size = len(self.nodes)
-		root_node = self.get_node_by_idx(i)
 		left_node = self.get_node_by_idx(l_idx)
 		right_node = self.get_node_by_idx(r_idx)
-		if l_idx <= heap_size and left_node and root_node and left_node.value > root_node.value:
-			largest = l_idx
-		elif r_idx <= heap_size and right_node and root_node and right_node.value > root_node.value:
-			largest = r_idx
+		if l_idx <= self.size and left_node and root_node and condition_operator(left_node.value, root_node.value):
+			smallest_or_largest = l_idx
 		else:
-			largest = i
-		# print("largest", largest)
-		if largest != i:
-			self.exchange(largest, i)
-			self.max_heapify(largest)
+			smallest_or_largest = i
+		if r_idx <= self.size and right_node and root_node and condition_operator(right_node.value, root_node.value):
+			smallest_or_largest = r_idx
+
+		if smallest_or_largest != i:
+			self.exchange(smallest_or_largest, i)
+			self._heapify(smallest_or_largest, condition_operator)
 
 	def exchange(self, i, j):
 		ith_node = self.get_node_by_idx(i)

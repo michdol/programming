@@ -56,30 +56,17 @@ class HeapTest(TestCase):
 
 	def test_max_heapify(self):
 		"""
-					4
-				  /   \
-				 5     3
-		"""
-		self.root = Node(4)
-		self.root.left = Node(5)
-		self.root.right = Node(3)
-
-		self.heap = Heap()
-		self.heap.nodes = [self.root, self.root.left, self.root.right]
-
-		self.heap.max_heapify(0)
-		self.assertEqual(self.heap.nodes[0].value, 5)
-		self.assertEqual(self.heap.nodes[1].value, 4)
-		self.assertEqual(self.heap.nodes[2].value, 3)
-		self.assertIs(self.heap.parent(1).value, 5)
-
-	def test_max_heapify_recursive(self):
-		"""
 					2
 				  /   \
 				 3     4
 				/ \
 			   5   1
+
+					5
+				  /   \
+				 4     2
+				/ \
+			   3   1
 		"""
 		self.root = Node(2)
 		self.root.left = Node(3)
@@ -91,11 +78,22 @@ class HeapTest(TestCase):
 		self.heap.nodes = [self.root, self.root.left, self.root.right, self.root.left.left, self.root.left.right]
 
 		self.heap.max_heapify(0)
+		self.assertEqual(self.heap.nodes[0].value, 4)
+		self.assertEqual(self.heap.nodes[1].value, 3)
+		self.assertEqual(self.heap.nodes[2].value, 2)
+		self.assertEqual(self.heap.nodes[3].value, 5)
+		self.assertEqual(self.heap.nodes[4].value, 1)
+		self.heap.max_heapify(1)
+		self.assertEqual(self.heap.nodes[0].value, 4)
+		self.assertEqual(self.heap.nodes[1].value, 5)
+		self.assertEqual(self.heap.nodes[2].value, 2)
+		self.assertEqual(self.heap.nodes[3].value, 3)
+		self.assertEqual(self.heap.nodes[4].value, 1)
 		self.heap.max_heapify(0)
 		self.assertEqual(self.heap.nodes[0].value, 5)
-		self.assertEqual(self.heap.nodes[1].value, 3)
-		self.assertEqual(self.heap.nodes[2].value, 4)
-		self.assertEqual(self.heap.nodes[3].value, 2)
+		self.assertEqual(self.heap.nodes[1].value, 4)
+		self.assertEqual(self.heap.nodes[2].value, 2)
+		self.assertEqual(self.heap.nodes[3].value, 3)
 		self.assertEqual(self.heap.nodes[4].value, 1)
 
 	def test_create_tree(self):
@@ -134,6 +132,41 @@ class HeapTest(TestCase):
 		self.assertEqual(root.right.left.right, heap.nodes[12])
 		self.assertEqual(root.right.right.left, heap.nodes[13])
 		self.assertIsNone(root.right.right.right)
+
+	def test_min_heapify(self):
+		"""
+					5
+				  /   \
+				 3     4
+				/ \
+			   2   1
+
+					1
+				  /   \
+				 2     5
+				/ \
+			   3   4
+		"""
+		self.heap = Heap([Node(i) for i in [5, 3, 4, 2, 1]])
+
+		self.heap.min_heapify(0)
+		self.assertEqual(self.heap.nodes[0].value, 4)
+		self.assertEqual(self.heap.nodes[1].value, 3)
+		self.assertEqual(self.heap.nodes[2].value, 5)
+		self.assertEqual(self.heap.nodes[3].value, 2)
+		self.assertEqual(self.heap.nodes[4].value, 1)
+		self.heap.min_heapify(0)
+		self.assertEqual(self.heap.nodes[0].value, 3)
+		self.assertEqual(self.heap.nodes[1].value, 1)
+		self.assertEqual(self.heap.nodes[2].value, 5)
+		self.assertEqual(self.heap.nodes[3].value, 2)
+		self.assertEqual(self.heap.nodes[4].value, 4)
+		self.heap.min_heapify(0)
+		self.assertEqual(self.heap.nodes[0].value, 1)
+		self.assertEqual(self.heap.nodes[1].value, 2)
+		self.assertEqual(self.heap.nodes[2].value, 5)
+		self.assertEqual(self.heap.nodes[3].value, 3)
+		self.assertEqual(self.heap.nodes[4].value, 4)
 
 
 if __name__ == "__main__":
