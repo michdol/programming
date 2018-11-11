@@ -12,6 +12,9 @@ class Node(object):
 	def __str__(self):
 		return "<Node (%d)>" % self.value
 
+	def __repr__(self):
+		return "<Node (%d) %s>" % (self.value, id(self))
+
 
 def safe_list_item_getter(func):
 	def wrap(*args):
@@ -93,7 +96,8 @@ class Heap(object):
 			smallest_or_largest = l_idx
 		else:
 			smallest_or_largest = i
-		if r_idx <= self.size and right_node and root_node and condition_operator(right_node.value, root_node.value):
+		smallest_or_largest_node = self.get_node_by_idx(smallest_or_largest)
+		if r_idx <= self.size and right_node and smallest_or_largest_node and condition_operator(right_node.value, smallest_or_largest_node.value):
 			smallest_or_largest = r_idx
 
 		if smallest_or_largest != i:
@@ -113,3 +117,14 @@ class Heap(object):
 		jth_node.right = i_right
 		self.nodes[i] = jth_node
 		self.nodes[j] = ith_node
+
+	def build_max_heap(self):
+		self._build_heap(self.max_heapify)
+
+	def build_min_heap(self):
+		self._build_heap(self.min_heapify)
+
+	def _build_heap(self, handler):
+		half = self.size // 2
+		for i in range(half, -1, -1):
+			handler(i)
