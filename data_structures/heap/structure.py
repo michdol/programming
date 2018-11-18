@@ -5,19 +5,6 @@ from operator import gt, lt
 import math
 
 
-class Node(object):
-	def __init__(self, value):
-		self.left = None
-		self.right = None
-		self.value = value
-
-	def __str__(self):
-		return "<Node (%d)>" % self.value
-
-	def __repr__(self):
-		return "<Node (%d) %s>" % (self.value, id(self))
-
-
 def safe_list_item_getter(func):
 	def wrap(*args):
 		try:
@@ -25,6 +12,44 @@ def safe_list_item_getter(func):
 		except IndexError:
 			return None
 	return wrap
+
+
+class Node(object):
+	def __init__(self, value):
+		self.left = None
+		self.right = None
+		self.value = value
+		self.heap = None
+		self.idx = None
+
+	def __str__(self):
+		return "<Node (%d)>" % self.value
+
+	def __repr__(self):
+		return "<Node (%d) %s>" % (self.value, id(self))
+
+	def get_left_index(self):
+		return 2 * self.idx + 1
+
+	def get_right_index(self):
+		return 2 * self.idx + 2
+
+	@property
+	@safe_list_item_getter
+	def parent(self):
+		if self.idx == 0:
+			return None
+		return self.heap.nodes[(self.idx - 1) // 2]
+
+	def is_left(self, node):
+		if not node:
+			raise ValueError("Must be %s type." % type(self))
+		return node is self.left
+
+	def is_right(self, node):
+		if not node:
+			raise ValueError("Must be %s type." % type(self))
+		return node is self.right
 
 
 class Heap(object):
@@ -44,9 +69,12 @@ class Heap(object):
 		for idx, node in enumerate(nodes):
 			left_idx, right_idx = self._calculate_children_indexes(idx, value)
 			left_node = self.get_node_by_idx(left_idx, nodes)
+			self._set_node_data(left_node, left_idx)
 			right_node = self.get_node_by_idx(right_idx, nodes)
+			self._set_node_data(right_node, right_idx)
 			node.left = left_node
 			node.right = right_node
+			self._set_node_data(node, idx)
 			# If there are no more nodes to set
 			if not all([left_node, right_node]):
 				break
@@ -58,25 +86,10 @@ class Heap(object):
 		right_idx = left_idx + 1
 		return left_idx, right_idx
 
-	@staticmethod
-	def get_left_index(i):
-		return 2 * i + 1
-
-	@staticmethod
-	def get_right_index(i):
-		return 2 * i + 2
-
-	@safe_list_item_getter
-	def left(self, i):
-		return self.nodes[self.get_left_index(i)]
-
-	@safe_list_item_getter
-	def right(self, i):
-		return self.nodes[self.get_right_index(i)]
-
-	@safe_list_item_getter
-	def parent(self, i):
-		return self.nodes[(i - 1) // 2]
+	def _set_node_data(self, node, idx):
+		if node:
+			node.idx = idx
+			node.heap = self
 
 	@safe_list_item_getter
 	def get_node_by_idx(self, i, nodes=None):
@@ -91,11 +104,9 @@ class Heap(object):
 		self._heapify(i, lt)
 
 	def _heapify(self, i, condition_operator):
-		if not self.size:
-			self.size = len(self.nodes)
 		root_node = self.get_node_by_idx(i)
-		l_idx = self.get_left_index(i)
-		r_idx = self.get_right_index(i)
+		l_idx = root_node.get_left_index()
+		r_idx = root_node.get_right_index()
 		left_node = self.get_node_by_idx(l_idx)
 		right_node = self.get_node_by_idx(r_idx)
 		if l_idx <= self.size and left_node and root_node and condition_operator(left_node.value, root_node.value):
@@ -113,16 +124,79 @@ class Heap(object):
 	def exchange(self, i, j):
 		ith_node = self.get_node_by_idx(i)
 		jth_node = self.get_node_by_idx(j)
+		parent, child = self.define_parent_and_child(ith_node, jth_node)
+		if parent and child:
+			self.exchange_parent_child(parent, child)
+		else:
+			self.exchange_distant_nodes(ith_node, jth_node)
+
+	def exchange_parent_child(self, parent, child):
+		# swapping left, right nodes fails
+		p_parent = parent.parent
+		p_left = parent.left
+		p_right = parent.right
+
+		c_left = child.left
+		c_right = child.right
+		self.set_parent_new_child(p_parent, parent, child)
+
+		parent.left = c_left
+		parent.right = c_right
+
+		if parent.is_left(child):
+			child.left = parent
+			child.right = p_right
+		else:
+			child.left = p_left
+			child.right = parent
+
+		i = parent.idx
+		j = child.idx
+		self.nodes[i] = child
+		child.idx = i
+		self.nodes[j] = parent
+		parent.idx = j
+
+	def define_parent_and_child(self, first, second):
+		if first is second.parent:
+			return first, second
+		elif second is first.parent:
+			return second, first
+		else:
+			return None, None
+
+	def exchange_distant_nodes(self, ith_node, jth_node):
+		i_parent = ith_node.parent
 		i_left = ith_node.left
 		i_right = ith_node.right
+
+		j_parent = jth_node.parent
 		j_left = jth_node.left
 		j_right = jth_node.right
+
+		# Set ith_node's new values
 		ith_node.left = j_left
 		ith_node.right = j_right
+		self.set_parent_new_child(i_parent, ith_node, jth_node)
+
+		# Set jth_node's new values
 		jth_node.left = i_left
 		jth_node.right = i_right
+		self.set_parent_new_child(j_parent, jth_node, ith_node)
+
+		# Update heap
+		i = ith_node.idx
+		j = jth_node.idx
 		self.nodes[i] = jth_node
+		jth_node.idx = i
 		self.nodes[j] = ith_node
+		ith_node.idx = j
+
+	def set_parent_new_child(self, parent, node, new_node):
+		if parent.is_left(node):
+			parent.left = new_node
+		else:
+			parent.right = new_node
 
 	def build_max_heap(self):
 		self._build_heap(self.max_heapify)
@@ -132,5 +206,38 @@ class Heap(object):
 
 	def _build_heap(self, handler):
 		half = self.size // 2
+		print("\n\nhalf", half)
 		for i in range(half, -1, -1):
 			handler(i)
+
+
+class MaxPriorityQueue(Heap):
+	@safe_list_item_getter
+	def maximum(self):
+		#print("tutej")
+		return self.nodes[0]
+
+	@safe_list_item_getter
+	def extract_max(self):
+		"""
+				  4
+			   /     \
+			 3        2
+			/
+		   1
+
+				  1
+			   /     \
+			 3        2
+		"""
+		self.exchange(0, -1)
+
+		maximum = self.nodes.pop(-1)
+		self.max_heapify(0)
+		maximum.left = None
+		maximum.right = None
+		# print("extract", self.nodes)
+		# print(self.nodes[0])
+		# print(self.nodes[0].left)
+		# print(self.nodes[0].right)
+		return maximum

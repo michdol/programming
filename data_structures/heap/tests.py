@@ -1,6 +1,67 @@
 from unittest import TestCase, main
 
-from structure import Node, Heap
+from structure import Node, Heap, MaxPriorityQueue
+
+
+class NodeTest(TestCase):
+	def test_parent(self):
+		first, second, third, fourth = Node(1), Node(2), Node(3), Node(4)
+		heap = Heap([first, second, third, fourth])
+
+		parent = first.parent
+		self.assertIsNone(parent)
+
+		parent = second.parent
+		self.assertIs(parent, first)
+		self.assertIs(parent, heap.nodes[0])
+
+		parent = third.parent
+		self.assertIs(parent, first)
+		self.assertIs(parent, heap.nodes[0])
+
+		parent = fourth.parent
+		self.assertIs(parent, second)
+		self.assertIs(parent, heap.nodes[1])
+
+	def test_get_left_idx__get_right_idx(self):
+		first, second, third, fourth = Node(1), Node(2), Node(3), Node(4)
+		Heap([first, second, third, fourth])
+
+		idx = first.get_left_index()
+		self.assertEqual(idx, 1)
+		idx = first.get_right_index()
+		self.assertEqual(idx, 2)
+
+		idx = second.get_left_index()
+		self.assertEqual(idx, 3)
+		idx = second.get_right_index()
+		self.assertEqual(idx, 4)
+
+		idx = third.get_left_index()
+		self.assertEqual(idx, 5)
+		idx = third.get_right_index()
+		self.assertEqual(idx, 6)
+
+		idx = fourth.get_left_index()
+		self.assertEqual(idx, 7)
+		idx = fourth.get_right_index()
+		self.assertEqual(idx, 8)
+
+	def test_is_left__is_right(self):
+		first, second, third, fourth = Node(1), Node(2), Node(3), Node(4)
+		Heap([first, second, third, fourth])
+
+		self.assertTrue(first.is_left(second))
+		self.assertFalse(first.is_right(second))
+
+		self.assertTrue(second.is_left(fourth))
+		self.assertFalse(second.is_right(third))
+
+		with self.assertRaises(ValueError):
+			second.is_left(None)
+
+		with self.assertRaises(ValueError):
+			second.is_right(None)
 
 
 class HeapTest(TestCase):
@@ -27,32 +88,6 @@ class HeapTest(TestCase):
 			self.root.left.left,
 			self.root.left.right
 		]
-
-	def test_parent(self):
-		parent = self.heap.parent(1)
-		self.assertIs(parent, self.root)
-		parent = self.heap.parent(2)
-		self.assertIs(parent, self.root)
-		parent = self.heap.parent(3)
-		self.assertIs(parent, self.root.left)
-		parent = self.heap.parent(4)
-		self.assertIs(parent, self.root.left)
-
-	def test_left(self):
-		left = self.heap.left(0)
-		self.assertIs(left, self.root.left)
-		left = self.heap.left(1)
-		self.assertIs(left, self.root.left.left)
-		left = self.heap.left(2)
-		self.assertIsNone(left)
-
-	def test_right(self):
-		right = self.heap.right(0)
-		self.assertIs(right, self.root.right)
-		right = self.heap.right(1)
-		self.assertIs(right, self.root.left.right)
-		right = self.heap.right(2)
-		self.assertIsNone(right)
 
 	def test_max_heapify(self):
 		"""
@@ -86,6 +121,111 @@ class HeapTest(TestCase):
 		self.assertEqual(self.heap.nodes[8].value, 4)
 		self.assertEqual(self.heap.nodes[9].value, 1)
 
+	def test_max_heapify_three(self):
+		nodes = [Node(i) for i in [1, 3, 2]]
+		self.heap = Heap(nodes)
+		self.heap.max_heapify(0)
+		self.assertEqual(self.heap.nodes[0].value, 3)
+		self.assertEqual(self.heap.nodes[0].left.value, 1)
+		self.assertEqual(self.heap.nodes[0].right.value, 2)
+
+	def test_exchange_parent_child(self):
+		"""
+					  1
+				   /    \
+				 2       3
+				/ \     / \
+			  4    5   6   7
+			 /\   /\   /\  /\
+		    8  9
+
+					  1
+				   /    \
+				 4       3
+				/ \     / \
+			  2    5   6   7
+			 /\   /\   /\  /\
+		    8  9
+		"""
+		nodes = [Node(i) for i in range(1, 18)]
+		self.heap = Heap(nodes)
+		self.heap.exchange(1, 3)
+
+		self.assertEqual(self.heap.nodes[0].value, 1)
+		self.assertEqual(self.heap.nodes[0].left.value, 4)
+		self.assertEqual(self.heap.nodes[0].right.value, 3)
+		self.assertEqual(self.heap.nodes[1].value, 4)
+		import pdb
+		pdb.set_trace()
+		self.assertEqual(self.heap.nodes[1].left.value, 2)
+		self.assertEqual(self.heap.nodes[1].right.value, 5)
+		self.assertEqual(self.heap.nodes[3].value, 2)
+		self.assertEqual(self.heap.nodes[3].left.value, 8)
+		self.assertEqual(self.heap.nodes[3].right.value, 9)
+
+		self.assertEqual(self.heap.nodes[1].parent.value, 1)
+		self.assertEqual(self.heap.nodes[3].parent.value, 4)
+		self.assertEqual(self.heap.nodes[4].parent.value, 4)
+		self.assertEqual(self.heap.nodes[7].parent.value, 2)
+		self.assertEqual(self.heap.nodes[8].parent.value, 2)
+
+	def test_exchange_distant_nodes(self):
+		"""
+					  1
+				   /    \
+				 2       3
+				/ \     / \
+			  4    5   6   7
+			 /\   /\   /\  /\
+		    8  9
+		   /\
+		  16 17
+
+					  1
+				   /    \
+				 8       3
+				/ \     / \
+			  4    5   6   7
+			 /\   /\   /\  /\
+		    2  9
+		   /\
+		  16 17
+		"""
+		nodes = [Node(i) for i in range(1, 18)]
+		self.heap = Heap(nodes)
+		self.heap.exchange_distant_nodes(self.heap.nodes[1], self.heap.nodes[7])
+		self.assertEqual(self.heap.nodes[1].value, 8)
+		self.assertEqual(self.heap.nodes[1].left.value, 4)
+		self.assertEqual(self.heap.nodes[1].right.value, 5)
+		self.assertEqual(self.heap.nodes[3].value, 4)
+		self.assertEqual(self.heap.nodes[3].left.value, 2)
+		self.assertEqual(self.heap.nodes[3].right.value, 9)
+		self.assertEqual(self.heap.nodes[7].value, 2)
+		self.assertEqual(self.heap.nodes[7].left.value, 16)
+		self.assertEqual(self.heap.nodes[7].right.value, 17)
+
+		self.assertEqual(self.heap.nodes[1].parent.value, 1)
+		self.assertEqual(self.heap.nodes[3].parent.value, 8)
+		self.assertEqual(self.heap.nodes[4].parent.value, 8)
+		self.assertEqual(self.heap.nodes[7].parent.value, 4)
+		self.assertEqual(self.heap.nodes[15].parent.value, 2)
+		self.assertEqual(self.heap.nodes[16].parent.value, 2)
+
+	def test_define_parent_and_child(self):
+		first = Node(1)
+		second = Node(2)
+		heap = Heap([first, second, Node(3), Node(4)])
+		parent, child, attr = heap.define_parent_and_child(heap.nodes[0], heap.nodes[1])
+		self.assertIs(parent, first)
+		self.assertIs(child, second)
+		parent, child, attr = heap.define_parent_and_child(heap.nodes[1], heap.nodes[0])
+		self.assertIs(parent, first)
+		self.assertIs(child, second)
+		parent, child, attr = heap.define_parent_and_child(heap.nodes[0], heap.nodes[3])
+		self.assertIsNone(parent)
+		self.assertIsNone(child)
+		self.assertIsNone(attr)
+
 	def test_create_tree(self):
 		"""
 						0
@@ -110,17 +250,24 @@ class HeapTest(TestCase):
 		root = heap.nodes[0]
 		self.assertEqual(root.left, heap.nodes[1])
 		self.assertEqual(root.right, heap.nodes[2])
+		self.assertEqual(root.idx, 0)
 		self.assertEqual(root.left.left, heap.nodes[3])
 		self.assertEqual(root.left.right, heap.nodes[4])
+		self.assertEqual(root.left.idx, 1)
 		self.assertEqual(root.right.left, heap.nodes[5])
 		self.assertEqual(root.right.right, heap.nodes[6])
+		self.assertEqual(root.right.idx, 2)
 		self.assertEqual(root.left.left.left, heap.nodes[7])
 		self.assertEqual(root.left.left.right, heap.nodes[8])
+		self.assertEqual(root.left.left.idx, 3)
 		self.assertEqual(root.left.right.left, heap.nodes[9])
 		self.assertEqual(root.left.right.right, heap.nodes[10])
+		self.assertEqual(root.left.right.idx, 4)
 		self.assertEqual(root.right.left.left, heap.nodes[11])
 		self.assertEqual(root.right.left.right, heap.nodes[12])
+		self.assertEqual(root.right.left.idx, 5)
 		self.assertEqual(root.right.right.left, heap.nodes[13])
+		self.assertEqual(root.right.right.idx, 6)
 		self.assertIsNone(root.right.right.right)
 
 	def test_min_heapify(self):
@@ -232,6 +379,33 @@ class HeapTest(TestCase):
 
 		self.heap = Heap([Node(i) for i in [4, 1, 3, 2, 16, 9, 10, 14, 8, 7, 15, 17, 18, 19, 20, 21]])
 		self.assertEqual(self.heap.height, 4)
+
+
+class MaxPriorityQueueTest(TestCase):
+	def test_maximum(self):
+		queue = MaxPriorityQueue([Node(i) for i in [4, 3, 2, 1]])
+		maximum = queue.maximum()
+		self.assertEqual(maximum.value, 4)
+		self.assertEqual(maximum.left.value, 3)
+		self.assertEqual(maximum.right.value, 2)
+
+		empty_queue = MaxPriorityQueue()
+		self.assertIsNone(empty_queue.maximum())
+
+	def test_extract_max(self):
+
+		queue = MaxPriorityQueue([Node(i) for i in [4, 3, 2, 1]])
+		maximum = queue.extract_max()
+		self.assertEqual(maximum.value, 4)
+		self.assertIsNone(maximum.left)
+		self.assertIsNone(maximum.right)
+
+		maximum = queue.maximum()
+		import pdb
+		#pdb.set_trace()
+		self.assertEqual(maximum.value, 3)
+		self.assertEqual(maximum.left.value, 2)
+		self.assertEqual(maximum.right.value, 1)
 
 
 if __name__ == "__main__":
