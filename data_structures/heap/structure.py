@@ -131,19 +131,20 @@ class Heap(object):
 			self.exchange_distant_nodes(ith_node, jth_node)
 
 	def exchange_parent_child(self, parent, child):
-		# swapping left, right nodes fails
+		is_left = parent.is_left(child)
 		p_parent = parent.parent
 		p_left = parent.left
 		p_right = parent.right
 
 		c_left = child.left
 		c_right = child.right
-		self.set_parent_new_child(p_parent, parent, child)
+		if p_parent:
+			self.set_parent_new_child(p_parent, parent, child)
 
 		parent.left = c_left
 		parent.right = c_right
 
-		if parent.is_left(child):
+		if is_left:
 			child.left = parent
 			child.right = p_right
 		else:
@@ -177,12 +178,14 @@ class Heap(object):
 		# Set ith_node's new values
 		ith_node.left = j_left
 		ith_node.right = j_right
-		self.set_parent_new_child(i_parent, ith_node, jth_node)
+		if i_parent:
+			self.set_parent_new_child(i_parent, ith_node, jth_node)
 
 		# Set jth_node's new values
 		jth_node.left = i_left
 		jth_node.right = i_right
-		self.set_parent_new_child(j_parent, jth_node, ith_node)
+		if j_parent:
+			self.set_parent_new_child(j_parent, jth_node, ith_node)
 
 		# Update heap
 		i = ith_node.idx
@@ -206,7 +209,6 @@ class Heap(object):
 
 	def _build_heap(self, handler):
 		half = self.size // 2
-		print("\n\nhalf", half)
 		for i in range(half, -1, -1):
 			handler(i)
 
@@ -214,7 +216,6 @@ class Heap(object):
 class MaxPriorityQueue(Heap):
 	@safe_list_item_getter
 	def maximum(self):
-		#print("tutej")
 		return self.nodes[0]
 
 	@safe_list_item_getter
@@ -233,11 +234,8 @@ class MaxPriorityQueue(Heap):
 		self.exchange(0, -1)
 
 		maximum = self.nodes.pop(-1)
+		self.size -= 1
 		self.max_heapify(0)
 		maximum.left = None
 		maximum.right = None
-		# print("extract", self.nodes)
-		# print(self.nodes[0])
-		# print(self.nodes[0].left)
-		# print(self.nodes[0].right)
 		return maximum

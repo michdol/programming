@@ -1,3 +1,4 @@
+import pdb
 from unittest import TestCase, main
 
 from structure import Node, Heap, MaxPriorityQueue
@@ -155,8 +156,8 @@ class HeapTest(TestCase):
 		self.assertEqual(self.heap.nodes[0].left.value, 4)
 		self.assertEqual(self.heap.nodes[0].right.value, 3)
 		self.assertEqual(self.heap.nodes[1].value, 4)
-		import pdb
-		pdb.set_trace()
+		# import pdb
+		# pdb.set_trace()
 		self.assertEqual(self.heap.nodes[1].left.value, 2)
 		self.assertEqual(self.heap.nodes[1].right.value, 5)
 		self.assertEqual(self.heap.nodes[3].value, 2)
@@ -215,16 +216,15 @@ class HeapTest(TestCase):
 		first = Node(1)
 		second = Node(2)
 		heap = Heap([first, second, Node(3), Node(4)])
-		parent, child, attr = heap.define_parent_and_child(heap.nodes[0], heap.nodes[1])
+		parent, child = heap.define_parent_and_child(heap.nodes[0], heap.nodes[1])
 		self.assertIs(parent, first)
 		self.assertIs(child, second)
-		parent, child, attr = heap.define_parent_and_child(heap.nodes[1], heap.nodes[0])
+		parent, child = heap.define_parent_and_child(heap.nodes[1], heap.nodes[0])
 		self.assertIs(parent, first)
 		self.assertIs(child, second)
-		parent, child, attr = heap.define_parent_and_child(heap.nodes[0], heap.nodes[3])
+		parent, child = heap.define_parent_and_child(heap.nodes[0], heap.nodes[3])
 		self.assertIsNone(parent)
 		self.assertIsNone(child)
-		self.assertIsNone(attr)
 
 	def test_create_tree(self):
 		"""
@@ -393,7 +393,6 @@ class MaxPriorityQueueTest(TestCase):
 		self.assertIsNone(empty_queue.maximum())
 
 	def test_extract_max(self):
-
 		queue = MaxPriorityQueue([Node(i) for i in [4, 3, 2, 1]])
 		maximum = queue.extract_max()
 		self.assertEqual(maximum.value, 4)
@@ -401,11 +400,9 @@ class MaxPriorityQueueTest(TestCase):
 		self.assertIsNone(maximum.right)
 
 		maximum = queue.maximum()
-		import pdb
-		#pdb.set_trace()
 		self.assertEqual(maximum.value, 3)
-		self.assertEqual(maximum.left.value, 2)
-		self.assertEqual(maximum.right.value, 1)
+		self.assertEqual(maximum.left.value, 1)
+		self.assertEqual(maximum.right.value, 2)
 
 
 if __name__ == "__main__":
