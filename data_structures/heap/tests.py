@@ -380,6 +380,37 @@ class HeapTest(TestCase):
 		self.heap = Heap([Node(i) for i in [4, 1, 3, 2, 16, 9, 10, 14, 8, 7, 15, 17, 18, 19, 20, 21]])
 		self.assertEqual(self.heap.height, 4)
 
+	def test_increase_key(self):
+		"""
+					  5
+				   /     \
+				 3        4
+				/ \
+			   2   1
+
+					  6
+				   /     \
+				 5        4
+				/ \
+			   2   1
+		"""
+		self.heap = Heap([Node(i) for i in [5, 3, 4, 2, 1]])
+		self.heap.increase_key(1, 6)
+
+		self.assertEqual(self.heap.nodes[0].value, 6)
+		self.assertEqual(self.heap.nodes[0].left.value, 5)
+		self.assertEqual(self.heap.nodes[0].right.value, 4)
+		self.assertEqual(self.heap.nodes[0].left.left.value, 2)
+		self.assertEqual(self.heap.nodes[0].left.right.value, 1)
+		self.assertEqual(self.heap.nodes[1].value, 5)
+		self.assertEqual(self.heap.nodes[1].left.value, 2)
+		self.assertEqual(self.heap.nodes[1].right.value, 1)
+
+	def test_increase_key_new_value_smaller_than_current(self):
+		self.heap = Heap([Node(i) for i in [5, 3, 4, 2, 1]])
+		with self.assertRaises(ValueError):
+			self.heap.increase_key(1, 2)
+
 
 class MaxPriorityQueueTest(TestCase):
 	def test_maximum(self):
@@ -403,6 +434,11 @@ class MaxPriorityQueueTest(TestCase):
 		self.assertEqual(maximum.value, 3)
 		self.assertEqual(maximum.left.value, 1)
 		self.assertEqual(maximum.right.value, 2)
+
+	def test_extract_max_empty_queue(self):
+		queue = MaxPriorityQueue()
+		with self.assertRaises(ValueError):
+			queue.extract_max()
 
 
 if __name__ == "__main__":

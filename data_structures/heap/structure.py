@@ -39,7 +39,11 @@ class Node(object):
 	def parent(self):
 		if self.idx == 0:
 			return None
-		return self.heap.nodes[(self.idx - 1) // 2]
+		return self.heap.nodes[self.parent_idx]
+
+	@property
+	def parent_idx(self):
+		return (self.idx - 1) // 2
 
 	def is_left(self, node):
 		if not node:
@@ -212,6 +216,20 @@ class Heap(object):
 		for i in range(half, -1, -1):
 			handler(i)
 
+	def increase_key(self, i, value):
+		node = self.get_node_by_idx(i)
+		if node.value > value:
+			raise ValueError("New value is smaller than current value.")
+		node.value = value
+		parent = node.parent
+		if not parent:
+			return
+		while i > 0 and parent and parent.value < node.value:
+			parent_idx = node.parent_idx
+			self.exchange(i, parent_idx)
+			parent = self.get_node_by_idx(parent_idx)
+			i = parent_idx
+
 
 class MaxPriorityQueue(Heap):
 	@safe_list_item_getter
@@ -220,17 +238,8 @@ class MaxPriorityQueue(Heap):
 
 	@safe_list_item_getter
 	def extract_max(self):
-		"""
-				  4
-			   /     \
-			 3        2
-			/
-		   1
-
-				  1
-			   /     \
-			 3        2
-		"""
+		if self.size < 1:
+			raise ValueError("Queue is empty.")
 		self.exchange(0, -1)
 
 		maximum = self.nodes.pop(-1)
