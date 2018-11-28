@@ -64,6 +64,28 @@ class NodeTest(TestCase):
 		with self.assertRaises(ValueError):
 			second.is_right(None)
 
+	def test_set_child_right(self):
+		node = Node(1)
+		node.left = Node(2)
+		node.set_child(Node(3))
+		self.assertEqual(node.left.value, 2)
+		self.assertEqual(node.right.value, 3)
+
+	def test_set_child_left(self):
+		node = Node(1)
+		node.right = Node(2)
+		node.set_child(Node(3))
+		self.assertEqual(node.left.value, 3)
+		self.assertEqual(node.right.value, 2)
+
+	def test_set_child_full_node(self):
+		node = Node(1)
+		node.left = Node(2)
+		node.right = Node(3)
+
+		with self.assertRaises(ValueError):
+			node.set_child(Node(4))
+
 
 class HeapTest(TestCase):
 
@@ -410,6 +432,31 @@ class HeapTest(TestCase):
 		self.heap = Heap([Node(i) for i in [5, 3, 4, 2, 1]])
 		with self.assertRaises(ValueError):
 			self.heap.increase_key(1, 2)
+
+	def test_max_heap_insert(self):
+		"""
+					  5
+				   /     \
+				 3        4
+				/ \
+			   2   1
+
+					  6
+				   /     \
+				 3        5
+				/ \		/
+			   2   1   4
+		"""
+		self.heap = Heap([Node(i) for i in [5, 3, 4, 2, 1]])
+		self.heap.max_heap_insert(6)
+
+		self.assertEqual(self.heap.nodes[0].value, 6)
+		self.assertEqual(self.heap.nodes[0].left.value, 3)
+		self.assertEqual(self.heap.nodes[0].right.value, 5)
+		self.assertEqual(self.heap.nodes[0].left.left.value, 2)
+		self.assertEqual(self.heap.nodes[0].left.right.value, 1)
+		self.assertEqual(self.heap.nodes[2].value, 5)
+		self.assertEqual(self.heap.nodes[2].left.value, 4)
 
 
 class MaxPriorityQueueTest(TestCase):

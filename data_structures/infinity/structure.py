@@ -1,6 +1,9 @@
 
 
 class Infinity(object):
+	def __str__(self):
+		return "inf"
+
 	def __gt__(self, other):
 		return True
 
@@ -21,6 +24,9 @@ class Infinity(object):
 
 
 class NegativeInfinity(object):
+	def __str__(self):
+		return "neg_inf"
+
 	def __gt__(self, other):
 		return False
 

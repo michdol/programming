@@ -1,8 +1,11 @@
+import math
 import pdb
+import sys
+sys.path.append("C:\\repos\programming")
 
 from operator import gt, lt
 
-import math
+from data_structures.infinity.structure import NegativeInfinity
 
 
 def safe_list_item_getter(func):
@@ -23,10 +26,10 @@ class Node(object):
 		self.idx = None
 
 	def __str__(self):
-		return "<Node (%d)>" % self.value
+		return "<Node (%s)>" % self.value
 
 	def __repr__(self):
-		return "<Node (%d) %s>" % (self.value, id(self))
+		return "<Node (%s) %s>" % (self.value, id(self))
 
 	def get_left_index(self):
 		return 2 * self.idx + 1
@@ -54,6 +57,14 @@ class Node(object):
 		if not node:
 			raise ValueError("Must be %s type." % type(self))
 		return node is self.right
+
+	def set_child(self, node):
+		if self.left and self.right:
+			raise ValueError("Children set already.")
+		if self.left:
+			self.right = node
+		else:
+			self.left = node
 
 
 class Heap(object):
@@ -227,8 +238,18 @@ class Heap(object):
 		while i > 0 and parent and parent.value < node.value:
 			parent_idx = node.parent_idx
 			self.exchange(i, parent_idx)
-			parent = self.get_node_by_idx(parent_idx)
+			parent = self.get_node_by_idx(node.parent_idx)
 			i = parent_idx
+
+	def max_heap_insert(self, value):
+		node = Node(NegativeInfinity())
+		node.heap = self
+		self.nodes.append(node)
+		node.idx = self.size
+		parent = node.parent
+		parent.set_child(node)
+		self.size += 1
+		self.increase_key(self.size - 1, value)
 
 
 class MaxPriorityQueue(Heap):
