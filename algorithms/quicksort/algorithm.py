@@ -64,6 +64,7 @@ def alternative_quick_sort(array):
 def test_performance():
 	number = 1000
 	setup_quick_sort = "arr = [2, 8, 7, 1, 3, 5, 6, 4]; from __main__ import quick_sort"
+	sleep(1)
 	quick_sort_result = timeit(
 		"quick_sort(arr, 0, 7)",
 		number=number,
@@ -72,6 +73,7 @@ def test_performance():
 	sleep(1)
 
 	setup_randomized_quick_sort = "arr = [2, 8, 7, 1, 3, 5, 6, 4]; from __main__ import randomized_quick_sort"
+	sleep(1)
 	randomized_quick_sort_result = timeit(
 		"randomized_quick_sort(arr, 0, 7)",
 		number=number,
@@ -80,6 +82,7 @@ def test_performance():
 	sleep(1)
 
 	setup_alternative_quick_sort = "arr = [2, 8, 7, 1, 3, 5, 6, 4]; from __main__ import alternative_quick_sort"
+	sleep(1)
 	alternative_quick_sort_result = timeit(
 		"alternative_quick_sort(arr)",
 		number=number,
